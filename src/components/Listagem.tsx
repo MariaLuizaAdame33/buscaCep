@@ -7,11 +7,44 @@ import { Cadastrointerfaces } from '../interfaces/Cadastrointerfaces';
 const Listagem = () => {
 
     const[usuarios,setUsuarios] = useState<Cadastrointerfaces[]>([]);
+    const[pesquisa, setPesquisa]= useState<string>('');
     const[error,setError]=useState("");
+
+    const handleState = (e: ChangeEvent<HTMLInputElement>)=>{
+        if(e.target.name ==="pesquisa"){
+            setPesquisa(e.target.value);
+        }
+    }
+
+    const buscar = (e:FormEvent)=>{
+        e.preventDefault();
+
+        async function fetchData(){
+            try{
+            
+            const response = await axios.post('http://10.137.9.134:8000/api/findNome',{nome : pesquisa},{
+                headers:{
+                    "Accept":"application/json",
+                    "Content-Type": "application/json"
+                }
+            }).then(function(response){
+                setUsuarios(response.data.data);
+            }).catch(function(error){
+                console.log(error);
+            });
+
+            }catch(error){
+                console.log(error);
+            }
+        }
+        fetchData();
+
+    }
+
     useEffect(()=>{
         async function fetchData(){
             try{
-                const response = await axios.get('http://10.137.9.132:8000/api/find');
+                const response = await axios.get('http://10.137.9.134:8000/api/find');
                 setUsuarios(response.data.data);
 
             }catch(error){
@@ -31,6 +64,28 @@ const Listagem = () => {
         <div>
             <main className={styles.main}>
                 <div className='container'>
+
+                    <div className='col-md mb-3'>
+                        <div className='card'>
+                            <div className='card-body'>
+                                <h5 className='card-title'>Pesquisar</h5>
+                                <form onSubmit={buscar} className='row'>
+                                    <div className='col-10'>
+                                        <input type="text" name="pesquisa" className='form-control' onChange={handleState}/>
+                                    </div>
+                                    <div className='col-1'>
+                                        <button type='submit' className='btn btn-sucess'>Pesquisar</button>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                     <div className='card'>
                         <div className='card-body'>
                             <h5 className='card-title'>
